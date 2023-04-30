@@ -2,6 +2,6 @@
 
 call %~dp0venv\Scripts\activate
 
-python tour-searcher-telegram-bot.py
+python tour_searcher_telegram_bot.py
 
 pause
