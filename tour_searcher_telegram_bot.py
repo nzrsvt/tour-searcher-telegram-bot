@@ -1,10 +1,12 @@
 from aiogram.utils import executor
 from handlers import engine
 from create_bot import dp
+import db_operations
 
-async def on_startup(_):
+async def onStartup(_):
     print('Bot has been launched successfully.')
+    db_operations.sqlStart()
 
-engine.register_handlers(dp)
+engine.registerHandlers(dp)
 
-executor.start_polling(dp, skip_updates=True, on_startup=on_startup)
+executor.start_polling(dp, skip_updates=True, on_startup=onStartup)
