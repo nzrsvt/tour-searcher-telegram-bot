@@ -7,7 +7,7 @@ startKb.add(startBtn)
 searchBtn = InlineKeyboardButton('Здійснити пошук', callback_data='searchCb')
 filterBtn = InlineKeyboardButton('Налаштувати фільтри пошуку', callback_data='filterCb')
 mainMenuKb = InlineKeyboardMarkup()
-mainMenuKb.row(startBtn, filterBtn)
+mainMenuKb.add(searchBtn).add(filterBtn)
 
 returnToMainMenuBtn = InlineKeyboardButton('Повернутися на головне меню', callback_data='returnToMainMenuCb')
 
@@ -25,7 +25,7 @@ choosePriceBtn = InlineKeyboardButton('Обрати вартість', callback_
 clearPriceBtn = InlineKeyboardButton('Очистити вибір вартості', callback_data='clearPriceCb')
 clearAllBtn = InlineKeyboardButton('Очистити весь вибір', callback_data='clearPriceCb')
 filterMenuKb = InlineKeyboardMarkup()
-filterMenuKb.row(addCountryBtn, clearCountryBtn).row(addCityBtn, clearCityBtn).row(chooseDurationBtn, clearDurationBtn).row(choosePriceBtn, clearPriceBtn).row(clearAllBtn, returnToMainMenuBtn)
+filterMenuKb.row(addCountryBtn, clearCountryBtn).row(addCityBtn, clearCityBtn).row(chooseDurationBtn, clearDurationBtn).row(choosePriceBtn, clearPriceBtn).add(clearAllBtn).add(returnToMainMenuBtn)
 
 sortByPriceIncrBtn = InlineKeyboardButton('За зростанням ціни', callback_data='sortByPriceIncrCb')
 sortByPriceDecrBtn = InlineKeyboardButton('За спаданням ціни', callback_data='sortByPriceDecrCb')
@@ -34,4 +34,4 @@ sortByDurationDecrBtn = InlineKeyboardButton('За зростанням трив
 dontSortBtn = InlineKeyboardButton('Не сортувати', callback_data='dontSortCb')
 returnToSearchMenuBtn = InlineKeyboardButton('Повернутися до перегляду турів', callback_data='returnToSearchMenuCb')
 sortMenuKb = InlineKeyboardMarkup()
-sortMenuKb.row(sortByPriceIncrBtn, sortByPriceDecrBtn).row(sortByDurationIncrBtn, sortByDurationDecrBtn).row(dontSortBtn, returnToSearchMenuBtn)
+sortMenuKb.row(sortByPriceIncrBtn, sortByPriceDecrBtn).row(sortByDurationIncrBtn, sortByDurationDecrBtn).add(dontSortBtn).add(returnToSearchMenuBtn)
