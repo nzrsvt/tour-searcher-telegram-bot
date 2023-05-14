@@ -26,3 +26,6 @@ def sqlCheckTelegramId(id):
 def sqlSelectAllTours():
     return cur.execute('SELECT * FROM Trip_Info').fetchall()
 
+def sortTypeSet(telegramId, sortType):
+    cur.execute('UPDATE telegram_user_selections SET selected_sort = ? WHERE telegram_id = ?', (sortType, telegramId))
+    base.commit()

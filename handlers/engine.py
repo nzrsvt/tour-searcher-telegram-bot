@@ -34,9 +34,23 @@ async def filterMenuCall(callback : types.CallbackQuery):
     await callback.message.answer(f'Оберіть фільтри: ', reply_markup=keyboard.filterMenuKb)
     await callback.answer()
 
+async def sortCall(callback : types.CallbackQuery):
+    telegramId = callback.message.chat.id
+    db_operations.sortTypeSet(telegramId, callback.data)
+    if callback.data == 'sortByPriceIncrCb':
+        await callback.message.answer(f'Ви успішно обрали сортування турів за зростанням ціни.', reply_markup=keyboard.sortMenuKb)
+    elif callback.data == 'sortByPriceDecrCb':
+        await callback.message.answer(f'Ви успішно обрали сортування турів за спаданням ціни.', reply_markup=keyboard.sortMenuKb)
+    elif callback.data == 'sortByDurationIncrCb':
+        await callback.message.answer(f'Ви успішно обрали сортування турів за зростанням тривалості.', reply_markup=keyboard.sortMenuKb)
+    elif callback.data == 'sortByDurationDecrCb':
+        await callback.message.answer(f'Ви успішно обрали сортування турів за спаданням тривалості.', reply_markup=keyboard.sortMenuKb)
+    await callback.answer()
+
 def registerHandlers(dp : Dispatcher):
     dp.register_message_handler(startCommand, commands=['start', 'help'])
     dp.register_callback_query_handler(mainMenuCall, text=['startCb', 'returnToMainMenuCb'])
     dp.register_callback_query_handler(searchMenuCall, text=['searchCb', 'returnToSearchMenuCb'])
     dp.register_callback_query_handler(sortMenuCall, text=['sortCb'])
     dp.register_callback_query_handler(filterMenuCall, text=['filterCb'])
+    dp.register_callback_query_handler(sortCall, text=['sortByPriceIncrCb', 'sortByPriceDecrCb', 'sortByDurationIncrCb', 'sortByDurationDecrCb'])
