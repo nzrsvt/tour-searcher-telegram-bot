@@ -14,7 +14,7 @@ def sqlStart():
         print("Database connected successfully.")
 
 def sqlAddNewUser(telegramId, userName):
-    cur.execute('INSERT INTO telegram_user_selections VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', (telegramId, userName, "none", "none", -1, 999, -1, 9999999, "none"))
+    cur.execute('INSERT INTO telegram_user_selections VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', (telegramId, userName, "none", "none", -1, 999999, -1, 999999, "none"))
     base.commit()
 
 def sqlCheckTelegramId(id):
@@ -23,8 +23,30 @@ def sqlCheckTelegramId(id):
     else:
         return "no_id"
     
-def sqlSelectAllTours():
-    return cur.execute('SELECT * FROM Trip_Info').fetchall()
+def sqlSelectTours(telegramId):
+    result = cur.execute('SELECT * FROM Trip_Info').fetchall()
+    if sqlSelectUserCountry(telegramId) != 'none':
+        result = [tour for tour in result if sqlSelectUserCountry(telegramId) in tour[1]]
+    if sqlSelectUserCity(telegramId) != 'none':
+        result = [tour for tour in result if sqlSelectUserCity(telegramId) in tour[2]]
+    if sqlSelectUserDurationFrom(telegramId) != -1:
+        result = [tour for tour in result if sqlSelectUserDurationFrom(telegramId) <= tour[3]]
+    if sqlSelectUserDurationTo(telegramId) != 999999:
+        result = [tour for tour in result if sqlSelectUserDurationTo(telegramId) >= tour[3]]
+    if sqlSelectUserPriceFrom(telegramId) != -1:
+        result = [tour for tour in result if sqlSelectUserPriceFrom(telegramId) <= tour[5]]
+    if sqlSelectUserPriceTo(telegramId) != 999999:
+        result = [tour for tour in result if sqlSelectUserPriceTo(telegramId) >= tour[5]]
+    tempSortType = sqlSelectUserSort(telegramId)
+    if tempSortType == 'sortByDurationIncrCb':
+        result = sorted(result, key=lambda x: x[3])
+    elif tempSortType == 'sortByDurationDecrCb':
+        result = sorted(result, key=lambda x: x[3], reverse=True)
+    elif tempSortType == 'sortByPriceIncrCb':
+        result = sorted(result, key=lambda x: x[5])
+    elif tempSortType == 'sortByPriceDecrCb':
+        result = sorted(result, key=lambda x: x[5], reverse=True)
+    return result
 
 def sortTypeSet(telegramId, sortType):
     cur.execute('UPDATE telegram_user_selections SET selected_sort = ? WHERE telegram_id = ?', (sortType, telegramId))
@@ -79,3 +101,24 @@ def selectedAllClear(telegramId):
     selectedCityClear(telegramId)
     selectedDurationClear(telegramId)
     selectedPriceClear(telegramId)
+
+def sqlSelectUserCountry(telegramId):
+    return cur.execute('SELECT selected_country FROM telegram_user_selections WHERE telegram_id = ?', (telegramId, )).fetchone()[0]
+
+def sqlSelectUserCity(telegramId):
+    return cur.execute('SELECT selected_city FROM telegram_user_selections WHERE telegram_id = ?', (telegramId, )).fetchone()[0]
+
+def sqlSelectUserDurationFrom(telegramId):
+    return cur.execute('SELECT selected_duration_from FROM telegram_user_selections WHERE telegram_id = ?', (telegramId, )).fetchone()[0]
+
+def sqlSelectUserDurationTo(telegramId):
+    return cur.execute('SELECT selected_duration_to FROM telegram_user_selections WHERE telegram_id = ?', (telegramId, )).fetchone()[0]
+
+def sqlSelectUserPriceFrom(telegramId):
+    return cur.execute('SELECT selected_price_from FROM telegram_user_selections WHERE telegram_id = ?', (telegramId, )).fetchone()[0]
+
+def sqlSelectUserPriceTo(telegramId):
+    return cur.execute('SELECT selected_price_to FROM telegram_user_selections WHERE telegram_id = ?', (telegramId, )).fetchone()[0]
+
+def sqlSelectUserSort(telegramId):
+    return cur.execute('SELECT selected_sort FROM telegram_user_selections WHERE telegram_id = ?', (telegramId, )).fetchone()[0]

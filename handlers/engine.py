@@ -5,6 +5,7 @@ from keyboards import keyboard
 import db_operations as db
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
+from time import sleep
 
 class FSM(StatesGroup):
     country = State()
@@ -23,16 +24,22 @@ async def startCommand(message: types.Message):
         await message.delete()
         await message.answer(f'{message.from_user.full_name}, Вас знову вітає бот у якому Ви можете зручно шукати тури!', reply_markup=keyboard.startKb)
 
-
 async def mainMenuCall(callback : types.CallbackQuery):
     await callback.message.answer(f'Оберіть наступну дію: ', reply_markup=keyboard.mainMenuKb)
     await callback.answer()
 
 async def searchMenuCall(callback : types.CallbackQuery):
-    await callback.message.answer(f'Знайдені тури: ', reply_markup=keyboard.searchMenuKb)
-    for tour in db.sqlSelectAllTours():
-        await callback.message.answer(f'Країни: {tour[1]}\nМіста: {tour[2]}\nТривалість: {tour[3]}\nПосилання: {tour[4]}\nВартість: {tour[5]}\n')
-    await callback.answer()
+    tours = db.sqlSelectTours(callback.message.chat.id)
+    if tours:
+        await callback.message.answer(f'Знайдені тури: ')
+        await callback.answer()
+        for tour in tours:
+            await callback.message.answer(f'Країни: {tour[1]}\nМіста: {tour[2]}\nТривалість: {tour[3]} днів\nПосилання: {tour[4]}\nВартість: {tour[5]} гривень\n')
+            sleep(0.4)
+        await callback.message.answer(f'Це всі тури які вдалося знайти за обраними фільтрами.', reply_markup=keyboard.searchMenuKb)
+    else:
+        await callback.message.answer(f'На жаль, турів за обраними фільтрами не знайдено.', reply_markup=keyboard.searchMenuKb)
+        await callback.answer()
 
 async def sortMenuCall(callback : types.CallbackQuery):
     await callback.message.answer(f'Оберіть варіант сортування: ', reply_markup=keyboard.sortMenuKb)
@@ -66,9 +73,9 @@ async def countryFilterCall(callback : types.CallbackQuery):
 
 async def countryFilterLoad(message : types.message, state : FSMContext):
     async with state.proxy() as data:
-        data['country'] = message.text
-    db.selectedCountrySet(message.chat.id, message.text)
-    await message.answer(f'Ви успішно обрали країну {message.text}.', reply_markup=keyboard.filterSelectionKb)
+        data['country'] = message.text.title()
+    db.selectedCountrySet(message.chat.id, message.text.title())
+    await message.answer(f'Ви успішно обрали країну {message.text.title()}.', reply_markup=keyboard.filterSelectionKb)
     await state.finish()
 
 async def cityFilterCall(callback : types.CallbackQuery):
@@ -78,9 +85,9 @@ async def cityFilterCall(callback : types.CallbackQuery):
 
 async def cityFilterLoad(message : types.message, state : FSMContext):
     async with state.proxy() as data:
-        data['city'] = message.text
+        data['city'] = message.text.title()
     db.selectedCitySet(message.chat.id, message.text)
-    await message.answer(f'Ви успішно обрали місто {message.text}.', reply_markup=keyboard.filterSelectionKb)
+    await message.answer(f'Ви успішно обрали місто {message.text.title()}.', reply_markup=keyboard.filterSelectionKb)
     await state.finish()
 
 async def durationFilterCall(callback : types.CallbackQuery):
