@@ -20,11 +20,11 @@ class FSM(StatesGroup):
 async def startCommand(message: types.Message):
     if db.sqlCheckTelegramId(message.chat.id) == "no_id":
         await message.delete()
-        await message.answer(f'👋{message.from_user.full_name}, Вас вітає бот у якому Ви можете зручно шукати тури!\n🔹Для початку роботи з ботом натисніть на кнопку нижче.👇', reply_markup=keyboard.startKb)
+        await message.answer(f'👋{message.from_user.full_name}, Вас вітає бот у якому Ви можете зручно шукати тури!\n👇Для початку роботи з ботом натисніть на кнопку нижче.', reply_markup=keyboard.startKb)
         db.sqlAddNewUser(message.chat.id, message.from_user.full_name)
     else:
         await message.delete()
-        await message.answer(f'👋{message.from_user.full_name}, Вас знову вітає бот у якому Ви можете зручно шукати тури!\n🔹Для початку роботи з ботом натисніть на кнопку нижче.👇', reply_markup=keyboard.startKb)
+        await message.answer(f'👋{message.from_user.full_name}, Вас знову вітає бот у якому Ви можете зручно шукати тури!\n👇Для початку роботи з ботом натисніть на кнопку нижче.', reply_markup=keyboard.startKb)
 
 async def mainMenuCall(callback : types.CallbackQuery):
     await callback.message.answer(f'🔸Оберіть наступну дію:', reply_markup=keyboard.mainMenuKb)
@@ -69,7 +69,7 @@ async def filterMenuCall(callback : types.CallbackQuery):
     if db.checkFiltersSelected(callback.message.chat.id) == "False":
         await callback.message.answer(f'🔖Оберіть фільтри пошуку турів: ', reply_markup=keyboard.filterMenuKb)
     else:
-        await callback.message.answer(f'🔖Оберіть фільтри пошуку турів.\n\n🔹ℹ️Обрані на даний момент фільтри:\n{db.returnSelectedFilters(callback.message.chat.id)}', reply_markup=keyboard.filterMenuKb)
+        await callback.message.answer(f'🔖Оберіть фільтри пошуку турів.\n\nℹ️Обрані на даний момент фільтри:\n{db.returnSelectedFilters(callback.message.chat.id)}', reply_markup=keyboard.filterMenuKb)
     await callback.answer()
 
 async def sortCall(callback : types.CallbackQuery):
