@@ -1,1 +1,1 @@
-from keyboards.keyboard import startKb, mainMenuKb, searchMenuKb, filterMenuKb, sortMenuKb, filterSelectionKb, durationSelectionKb, priceSelectionKb, returnToDurationFilterMenuKb, returnToPriceFilterMenuKb
+from keyboards.keyboard import startKb, mainMenuKb, searchMenuKb, filterMenuKb, sortMenuKb, filterSelectionKb, durationSelectionKb, priceSelectionKb, returnToDurationFilterMenuKb, returnToPriceFilterMenuKb, returnToFiltersMenuKb, sortSelectionKb
