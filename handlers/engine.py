@@ -102,10 +102,13 @@ async def countryFilterCall(callback : types.CallbackQuery):
     await callback.answer()
 
 async def countryFilterLoad(message : types.message, state : FSMContext):
-    async with state.proxy() as data:
-        data['country'] = message.text.title()
-    db.selectedCountrySet(message.chat.id, message.text.title())
-    await message.answer(f'✅Ви успішно додали країну {message.text.title()} до пошуку.', reply_markup=keyboard.filterSelectionKb)
+    if af.checkCorrectnessOfInput(message.text) != None:
+        async with state.proxy() as data:
+            data['country'] = message.text.title()
+        db.selectedCountrySet(message.chat.id, message.text.title())
+        await message.answer(f'✅Ви успішно додали країну {message.text.title()} до пошуку.', reply_markup=keyboard.filterSelectionKb)
+    else: 
+        await message.answer(f'❌Назва країни введена некоректно.\nℹ️Введене значення повинно містити назву лише однієї країни українськими літерами.', reply_markup=keyboard.filterSelectionKb)
     await state.finish()
 
 async def cityFilterCall(callback : types.CallbackQuery):
@@ -114,10 +117,13 @@ async def cityFilterCall(callback : types.CallbackQuery):
     await callback.answer()
 
 async def cityFilterLoad(message : types.message, state : FSMContext):
-    async with state.proxy() as data:
-        data['city'] = message.text.title()
-    db.selectedCitySet(message.chat.id, message.text)
-    await message.answer(f'✅Ви успішно додали місто {message.text.title()} до пошуку.', reply_markup=keyboard.filterSelectionKb)
+    if af.checkCorrectnessOfInput(message.text) != None:
+        async with state.proxy() as data:
+            data['city'] = message.text.title()
+        db.selectedCitySet(message.chat.id, message.text)
+        await message.answer(f'✅Ви успішно додали місто {message.text.title()} до пошуку.', reply_markup=keyboard.filterSelectionKb)
+    else: 
+        await message.answer(f'❌Назва міста введена некоректно.\nℹ️Введене значення повинно містити назву лише одного міста українськими літерами.', reply_markup=keyboard.filterSelectionKb)
     await state.finish()
 
 async def durationFilterCall(callback : types.CallbackQuery):
