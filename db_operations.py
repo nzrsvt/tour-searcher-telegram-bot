@@ -1,4 +1,5 @@
 import pypyodbc
+import additional_functions as af
 
 server = 'NZRSVT\SQLEXPRESS' 
 database = 'Travel_Site' 
@@ -25,18 +26,32 @@ def sqlCheckTelegramId(id):
     
 def sqlSelectTours(telegramId):
     result = cur.execute('SELECT * FROM Trip_Info').fetchall()
-    if sqlSelectUserCountry(telegramId) != 'none':
-        result = [tour for tour in result if sqlSelectUserCountry(telegramId) in tour[1]]
-    if sqlSelectUserCity(telegramId) != 'none':
-        result = [tour for tour in result if sqlSelectUserCity(telegramId) in tour[2]]
-    if sqlSelectUserDurationFrom(telegramId) != -1:
-        result = [tour for tour in result if sqlSelectUserDurationFrom(telegramId) <= tour[3]]
-    if sqlSelectUserDurationTo(telegramId) != 999999:
-        result = [tour for tour in result if sqlSelectUserDurationTo(telegramId) >= tour[3]]
-    if sqlSelectUserPriceFrom(telegramId) != -1:
-        result = [tour for tour in result if sqlSelectUserPriceFrom(telegramId) <= tour[5]]
-    if sqlSelectUserPriceTo(telegramId) != 999999:
-        result = [tour for tour in result if sqlSelectUserPriceTo(telegramId) >= tour[5]]
+    temp = sqlSelectUserCountry(telegramId)
+    if temp != 'none':
+        if ',' in temp:
+            selectedCountries = temp.split(',')
+            result = [tour for tour in result if all(country in tour[1] for country in selectedCountries)]
+        else:
+            result = [tour for tour in result if temp in tour[1]]
+    temp = sqlSelectUserCity(telegramId)
+    if temp != 'none':
+        if ',' in temp:
+            selectedCities = temp.split(',')
+            result = [tour for tour in result if all(city in tour[2] for city in selectedCities)]
+        else:
+            result = [tour for tour in result if temp in tour[2]]
+    temp = sqlSelectUserDurationFrom(telegramId)    
+    if temp != -1:
+        result = [tour for tour in result if temp <= tour[3]]
+    temp = sqlSelectUserDurationTo(telegramId)
+    if temp != 999999:
+        result = [tour for tour in result if temp >= tour[3]]
+    temp = sqlSelectUserPriceFrom(telegramId)
+    if temp != -1:
+        result = [tour for tour in result if temp <= tour[5]]
+    temp = sqlSelectUserPriceTo(telegramId)
+    if temp != 999999:
+        result = [tour for tour in result if temp >= tour[5]]
     tempSortType = sqlSelectUserSort(telegramId)
     if tempSortType == 'sortByDurationIncrCb':
         result = sorted(result, key=lambda x: x[3])
@@ -53,7 +68,12 @@ def sortTypeSet(telegramId, sortType):
     base.commit()
 
 def selectedCountrySet(telegramId, country):
-    cur.execute('UPDATE telegram_user_selections SET selected_country = ? WHERE telegram_id = ?', (country, telegramId))
+    tempCountry = sqlSelectUserCountry(telegramId)
+    if tempCountry == 'none':
+        cur.execute('UPDATE telegram_user_selections SET selected_country = ? WHERE telegram_id = ?', (country, telegramId))
+    else:
+        tempCountries = tempCountry + "," + country
+        cur.execute('UPDATE telegram_user_selections SET selected_country = ? WHERE telegram_id = ?', (tempCountries, telegramId))
     base.commit()
 
 def selectedCitySet(telegramId, city):
@@ -143,10 +163,10 @@ def returnSelectedFilters(telegramId):
     result = "〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️\n"
     tempSelection = sqlSelectUserCountry(telegramId)
     if tempSelection != 'none':
-        result += "🌍Обрана країна: " + tempSelection + ";\n"
+        result += "🌍Обрані країни: " + af.addSpacesAfterComma(tempSelection) + ";\n"
     tempSelection = sqlSelectUserCity(telegramId)
     if tempSelection != 'none':
-        result += "🚩Обране місто: " + tempSelection + ";\n"
+        result += "🚩Обрані міста: " + af.addSpacesAfterComma(tempSelection) + ";\n"
     tempSelection = sqlSelectUserDurationFrom(telegramId)
     tempSelection2 = sqlSelectUserDurationTo(telegramId)
     if (tempSelection != -1) and (tempSelection2 != 999999):
