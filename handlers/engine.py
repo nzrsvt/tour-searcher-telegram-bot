@@ -102,7 +102,7 @@ async def countryFilterCall(callback : types.CallbackQuery):
     await callback.answer()
 
 async def countryFilterLoad(message : types.message, state : FSMContext):
-    if af.checkCorrectnessOfInput(message.text) != None:
+    if af.checkCorrectnessOfInputForText(message.text) != None:
         async with state.proxy() as data:
             data['country'] = message.text.title()
         db.selectedCountrySet(message.chat.id, message.text.title())
@@ -117,7 +117,7 @@ async def cityFilterCall(callback : types.CallbackQuery):
     await callback.answer()
 
 async def cityFilterLoad(message : types.message, state : FSMContext):
-    if af.checkCorrectnessOfInput(message.text) != None:
+    if af.checkCorrectnessOfInputForText(message.text) != None:
         async with state.proxy() as data:
             data['city'] = message.text.title()
         db.selectedCitySet(message.chat.id, message.text)
@@ -136,7 +136,7 @@ async def durationFromFilterCall(callback : types.CallbackQuery):
     await callback.answer()
 
 async def durationFromFilterLoad(message : types.message, state : FSMContext):
-    if isinstance(message.text, int) == True:
+    if af.checkCorrectnessOfInputForNumbers(message.text) != None:
         async with state.proxy() as data:
             data['durationFrom'] = message.text
         db.selectedDurationFromSet(message.chat.id, message.text)
@@ -151,7 +151,7 @@ async def durationToFilterCall(callback : types.CallbackQuery):
     await callback.answer()
 
 async def durationToFilterLoad(message : types.message, state : FSMContext):
-    if isinstance(message.text, int) == True:
+    if af.checkCorrectnessOfInputForNumbers(message.text) != None:
         async with state.proxy() as data:
             data['durationTo'] = message.text
         db.selectedDurationToSet(message.chat.id, message.text)
@@ -170,11 +170,11 @@ async def priceFromFilterCall(callback : types.CallbackQuery):
     await callback.answer()
 
 async def priceFromFilterLoad(message : types.message, state : FSMContext):
-    if isinstance(message.text, int) == True:
+    if af.checkCorrectnessOfInputForNumbers(message.text) != None:
         async with state.proxy() as data:
             data['priceFrom'] = message.text
         db.selectedPriceFromSet(message.chat.id, message.text)
-        await message.answer(f'✅Ви успішно обрали мінімальну вартість туру {message.text} гривень.', reply_markup=keyboard.returnToPriceFilterMenuKb)
+        await message.answer(f'✅Ви успішно обрали мінімальну вартість туру {message.text} грн.', reply_markup=keyboard.returnToPriceFilterMenuKb)
     else: 
         await message.answer(f'❌Мінімальна вартість туру введена некоректно.\nℹ️Введене значення повинно містити лише число.', reply_markup=keyboard.returnToPriceFilterMenuKb)
     await state.finish()
@@ -185,11 +185,11 @@ async def priceToFilterCall(callback : types.CallbackQuery):
     await callback.answer()
 
 async def priceToFilterLoad(message : types.message, state : FSMContext):
-    if isinstance(message.text, int) == True:
+    if af.checkCorrectnessOfInputForNumbers(message.text) != None:
         async with state.proxy() as data:
             data['priceTo'] = message.text
         db.selectedPriceToSet(message.chat.id, message.text)
-        await message.answer(f'✅Ви успішно обрали максимальну вартість туру {message.text} гривень.', reply_markup=keyboard.returnToPriceFilterMenuKb)
+        await message.answer(f'✅Ви успішно обрали максимальну вартість туру {message.text} грн.', reply_markup=keyboard.returnToPriceFilterMenuKb)
     else: 
         await message.answer(f'❌Максимальна вартість туру введена некоректно.\nℹ️Введене значення повинно містити лише число.', reply_markup=keyboard.returnToPriceFilterMenuKb)    
     await state.finish()
