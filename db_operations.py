@@ -68,16 +68,21 @@ def sortTypeSet(telegramId, sortType):
     base.commit()
 
 def selectedCountrySet(telegramId, country):
-    tempCountry = sqlSelectUserCountry(telegramId)
-    if tempCountry == 'none':
+    tempUserSelection = sqlSelectUserCountry(telegramId)
+    if tempUserSelection == 'none':
         cur.execute('UPDATE telegram_user_selections SET selected_country = ? WHERE telegram_id = ?', (country, telegramId))
     else:
-        tempCountries = tempCountry + "," + country
+        tempCountries = tempUserSelection + "," + country
         cur.execute('UPDATE telegram_user_selections SET selected_country = ? WHERE telegram_id = ?', (tempCountries, telegramId))
     base.commit()
 
 def selectedCitySet(telegramId, city):
-    cur.execute('UPDATE telegram_user_selections SET selected_city = ? WHERE telegram_id = ?', (city, telegramId))
+    tempUserSelection = sqlSelectUserCity(telegramId)
+    if tempUserSelection == 'none':
+        cur.execute('UPDATE telegram_user_selections SET selected_city = ? WHERE telegram_id = ?', (city, telegramId))
+    else:
+        tempCities = tempUserSelection + "," + city
+        cur.execute('UPDATE telegram_user_selections SET selected_city = ? WHERE telegram_id = ?', (tempCities, telegramId)) 
     base.commit()
 
 def selectedDurationFromSet(telegramId, durationFrom):
